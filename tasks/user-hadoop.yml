@@ -1,17 +1,9 @@
-- name: "Add the user {{user_name}} - Master"
+- name: "Add the user {{user_name}}"
   user:
     name: "{{user_name}}"
     password: "{{user_password}} | password_hash('sha512')"
     shell: "/bin/bash"
     generate_ssh_key: yes
-
-- name: "Add the user {{user_name}} - Worker"
-  user:
-    name: "{{user_name}}"
-    password: "{{user_password}} | password_hash('sha512')"
-    shell: /bin/bash
-    generate_ssh_key: no
-  when: inventory_hostname != ip_master
 
 - name: "Get the public SSH key- id_rsa.pub - Master"
   slurp:

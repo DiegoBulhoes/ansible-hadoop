@@ -1,6 +1,6 @@
 - name: "Insert env Hadoop - bashrc"
   blockinfile:
-    path: "/home/{{user_name}}/.bashrc"
+    path: "/home/{{item}}/.bashrc"
     block: |
       export JAVA_HOME="{{java_home}}"
       export HADOOP_HOME="{{hadoop_home}}"
@@ -8,9 +8,9 @@
       export HADOOP_COMMON_HOME="{{hadoop_home}}"
       export HADOOP_HDFS_HOME="{{hadoop_home}}"
       export HADOOP_YARN_HOME="{{hadoop_home}}"
-      export PATH=/usr/local/bin/hadoop:/usr/local/sbin/hadoop:$PATH
+      export PATH=/bin/hadoop:/bin/hadoop:$PATH
       export HADOOP_CONF_DIR="{{hadoop_home}}/etc/hadoop"
-
+  loop: "{{list_users}}"
 
 - name: "Add files template -  hadoop"
   template:
@@ -58,16 +58,32 @@
   lineinfile:
     path: "/etc/hosts"
     insertbefore: BOF
-    line: '{{ip_internal_master}} {{fqnd_cluster}}'
+    line: "{{ip_internal_master}} {{fqnd_cluster}}"
+
+- name: "Find all files in {{hadoop_home}}/bin/"
+  find:
+    paths: ["{{hadoop_home}}/bin/"]
+  register: bin_hadoop
+  changed_when: False
 
 - name: Create symbolic link - bin
+  become: True
   file:
-    src: "{{hadoop_home}}/bin"
-    dest: "/usr/local/bin/hadoop"
+    src: "{{ item.path }}"
+    path: "/bin/{{ item.path | basename }}"
     state: link
+  with_items: "{{ bin_hadoop.files }}"
+
+- name: "Find all files in {{hadoop_home}}/bin/"
+  find:
+    paths: ["{{hadoop_home}}/sbin/"]
+  register: sbin_hadoop
+  changed_when: False
 
 - name: Create symbolic link - sbin
+  become: True
   file:
-    src: "{{hadoop_home}}/sbin"
-    dest: "/usr/local/sbin/hadoop"
+    src: "{{ item.path }}"
+    path: "/bin/{{ item.path | basename }}"
     state: link
+  with_items: "{{ sbin_hadoop.files }}"
