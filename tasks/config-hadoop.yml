@@ -8,6 +8,7 @@
       export HADOOP_COMMON_HOME="{{hadoop_home}}"
       export HADOOP_HDFS_HOME="{{hadoop_home}}"
       export HADOOP_YARN_HOME="{{hadoop_home}}"
+      export HADOOP_LOG_DIR="{{hadoop_log_dir}}"
       export PATH=/bin/hadoop:/bin/hadoop:$PATH
       export HADOOP_CONF_DIR="{{hadoop_home}}/etc/hadoop"
   loop: "{{list_users}}"
@@ -32,17 +33,17 @@
 
 - name: "Create a directory logs"
   file:
-    path: "{{hadoop_home}}/logs"
+    path: "{{hadoop_log_dir}}"
     state: "directory"
 
-- name: "Create a directory tmp"
+- name: "Create a directory dfs"
   file:
     path: "{{ item }}"
     state: "directory"
   loop:
-    - "/tmp/hadoop-hadoop/dfs/namenode"
-    - "/tmp/hadoop-hadoop/dfs/name"
-    - "/tmp/hadoop-hadoop/"
+    - "{{path_dfs}}"
+    - "{{path_dfs}}/namenode"
+    - "{{path_dfs}}/name"
 
 - name: "Change hadoop files permission"
   file:
@@ -52,7 +53,8 @@
     recurse: yes
   loop:
     - "{{hadoop_home}}"
-    - "/tmp/hadoop-hadoop/"
+    - "{{path_dfs}}"
+    - "{{hadoop_log_dir}}"
 
 - name: "Add FQDN cluster - /etc/hosts "
   lineinfile:

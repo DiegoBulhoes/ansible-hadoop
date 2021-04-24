@@ -7,10 +7,10 @@
     </property>
     <property>
         <name>dfs.namenode.name.dir</name>
-        <value>/tmp/hdfs/namenode</value>
+        <value>{{path_dfs}}/namenode</value>
     </property>
     <property>
         <name>dfs.datanode.data.dir</name>
-        <value>/tmp/hdfs/datanode</value>
+        <value>{{path_dfs}}/datanode</value>
     </property>
 </configuration>
